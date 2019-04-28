@@ -16,10 +16,9 @@ public class Main {
                 break;
             }
             System.out.println(x);
-
         }
         // error handling
-        System.out.println("Don");
+        System.out.println("Done");
 
     }
 }
