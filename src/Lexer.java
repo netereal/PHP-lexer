@@ -1,185 +1,31 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.*;
 
 public class Lexer {
-    static String PATTERNS = ""
-            + "(?<COMMENT>(?:#|//)[^\\r\\n]*|/\\*[\\s\\S]*?\\*/)|"
-            + "(?<CONSTSTRING>[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*)|"
-            + "(?<EVAL>eval\b)|"
-            + "(?<REQUIRE>require\b)|"
-            + "(?<REQUIREONCE>require_once\b)|"
-            + "(?<OPENTAGWITHECHO><(\\?|%)=)|"
-            + "(?<OPENTAG>(<\\?php|<\\?|<%)\\s?)|"
-            + "(?<CLOSETAG>\\?>|%>)|"
-            +"(?<CAST>\\((real|double|float|bool|boolean|array|string|unset|object|int)\\))|"
-            // + "(?<     STRING   >   \"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"        )|"
 
-            + "(?<HEXNUMBER>0x[0-9a-fA-F]+(?:[eE][\\\\+\\\\-]?[0-9]+)?)|"
-            +"(?<OCTNUMBER>0[0-9]+(?:[eE][\\+\\-]?[0-9]+)?)|"
-            + "(?<FLOATNUMBER>([0-9]*\\.[0-9]+|[0-9]+\\.[0-9]*)(?:[eE][\\+\\-]?[0-9]+)?)|"
-            + "(?<INTNUMBER>(?:0|[1-9][0-9]*)(?:[eE][\\+\\-]?[0-9]+)?)|"
-            + "(?<VARIABLE>\\$[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*\\b)|"
+    public class TokenPattern {
 
-            +"(?<NS>\\\\)|"
-            +"(?<OBJECTOPERATOR>\\->)|"
-            +"(?<DOUBLEARROW>=>)|"
-            +"(?<INCREMENT>\\+\\+)|"
-            +"(?<DECREMENT>\\-\\-)|"
-            +"(?<COALESCE>\\?\\?)|"
-            +"(?<POW>\\*\\*)|"
-            +"(?<AT>@)|"
+        public final String name;
+        public final String pattern;
 
-            +"(?<PLUSEQUAL>\\+=)|"
-            +"(?<MINUSEQUAL>\\-=)|"
-            +"(?<MULEQUAL>\\*=)|"
-            +"(?<DIVEQUAL>/=)|"
-            +"(?<CONCATEQUAL>\\.=)|"
-            +"(?<MODEQUAL>%=)|"
-            +"(?<ANDEQUAL>&=)|"
-            +"(?<OREQUAL>\\|=)|"
-            +"(?<XOREQUAL>\\^=)|"
-            +"(?<SLEQUAL><<=)|"
-            +"(?<SREQUAL>>>=)|"
-            +"(?<IDENTICAL>===)|"
-            +"(?<NOTIDENTICAL>!==)|"
+        TokenPattern(String name, String pattern) {
+            this.name = name;
+            this.pattern = pattern;
+        }
+    }
+    static public ArrayList<TokenPattern> patterns = new ArrayList<TokenPattern>();
+
+    private void fillPatterns(){
+        patterns.add(new TokenPattern("COMMENT", "(?:#|//)[^\\r\\n]*|/\\*[\\s\\S]*?\\*/"));
+        patterns.add(new TokenPattern("OPENTAG", "(<\\?php|<\\?|<%)\\s?"));
+        patterns.add(new TokenPattern("CLOSETAG", "\\?>|%>"));
+        patterns.add(new TokenPattern("OPENTAGWITHECHO", "<(\\?|%)="));
 
 
-            +"(?<EQUAL>==)|"
-            +"(?<ASSIGN>=)|"
-            +"(?<NOTEQUAL>!=)|"
-            +"(?<NOT>!)|"
-            +"(?<BOOLEANAND>&&)|"
-            +"(?<BOOLEANOR>\\|\\|)|"
-            +"(?<BINAND>&)|"
-            +"(?<BINOR>\\|)|"
-
-            +"(?<BINNOT>~)|"
-            +"(?<ELLIPSIS>\\.\\.\\.)|"
-            +"(?<MINUS>\\-)|"
-            +"(?<PLUS>\\+)|"
-            +"(?<MUL>\\*)|"
-            +"(?<CONCAT>\\.)|"
-            +"(?<DIV>/)|"
-            +"(?<MOD>%)|"
-            +"(?<XOR>\\^)|"
-            +"(?<SPACESHIP><=>)|"
-            +"(?<SL><<)|"
-            +"(?<SR>>>)|"
-            +"(?<GREATEROREQUAL>>=)|"
-            +"(?<GREATER>>)|"
-            +"(?<LESSOREQUAL><=)|"
-            +"(?<LESS><)|"
-            +"(?<SEMICOLON>;)|"
-            +"(?<DOUBLECOLON>::)|"
-            +"(?<COLON>:)|"
-            +"(?<QMARK>\\?)|"
-            +"(?<COMMA>,)|"
-            +"(?<LOGICALOR>or\b)|"
-            +"(?<LOGICALAND>and\b)|"
-            +"(?<LOGICALXOR>xor\b)|"
-
-            +"(?<PARENTHESISOPEN>\\()|"
-            +"(?<PARENTHESISCLOSE>\\))|"
-            +"(?<BRACKETOPEN>\\[)|"
-            +"(?<BRACKETCLOSE>\\])|"
-            +"(?<BRACEOPEN>\\{)|"
-            +"(?<BRACECLOSE>\\})|"
-
-            +"(?<NEW>new\b)|"
-            +"(?<CLONE>clone\b)|"
-            +"(?<EXIT>exit\b)|"
-            +"(?<IF>if\b)|"
-            +"(?<ELSEIF>elseif\b)|"
-            +"(?<ELSE>else\b)|"
-            +"(?<ENDIF>endif\b)|"
-            +"(?<ECHO>echo\b)|"
-            +"(?<DO>do\b)|"
-            +"(?<WHILE>while\b)|"
-            +"(?<ENDWHILE>endwhile\b)|"
-            +"(?<FOR>for\b)|"
-            +"(?<ENDFOR>endfor\b)|"
-            +"(?<FOREACH>foreach\b)|"
-            +"(?<ENDFOREACH>endforeach\b)|"
-            +"(?<DECLARE>declare\b)|"
-            +"(?<ENDDECLARE>enddeclare\b)|"
-            +"(?<AS>as\b)|"
-            +"(?<SWITCH>switch\b)|"
-            +"(?<ENDSWITCH>endswitch\b)|"
-            +"(?<CASE>case\b)|"
-            +"(?<DEFAULT>default\b)|"
-            +"(?<BREAK>break\b)|"
-            +"(?<CONTINUE>continue\b)|"
-            +"(?<GOTO>goto\b)|"
-            +"(?<FUNCTION>function\b)|"
-            +"(?<CONST>const\b)|"
-            +"(?<RETURN>return\b)|"
-            +"(?<TRY>try\b)|"
-            +"(?<CATCH>catch\b)|"
-
-
-            +"(?<FINALLY>finally\b)|"
-            +"(?<THROW>throw\b)|"
-            +"(?<USE>use\b)|"
-            +"(?<INSTEADOF>insteadof\b)|"
-            +"(?<GLOBAL>global\b)|"
-            +"(?<STATIC>static\b)|"
-            +"(?<ABSTRACT>abstract\b)|"
-            +"(?<FINAL>final\b)|"
-            +"(?<PRIVATE>private\b)|"
-            +"(?<PROTECTED>protected\b)|"
-            +"(?<PUBLIC>public\b)|"
-            +"(?<VAR>var\b)|"
-            +"(?<UNSET>unset\b)|"
-            +"(?<ISSET>isset\b)|"
-            +"(?<EMPTY>empty\b)|"
-            +"(?<HALTCOMPILER>__halt_compiler\b)|"
-            +"(?<CLASS>class\b)|"
-            +"(?<TRAIT>trait\b)|"
-            +"(?<INTERFACE>interface\b)|"
-            +"(?<EXTENDS>extends\b)|"
-            +"(?<IMPLEMENTS>implements\b)|"
-
-            +"(?<LIST>list\b)|"
-            +"(?<ARRAY>array\b)|"
-            +"(?<CALLABLE>callable\b)|"
-            +"(?<LINE>__LINE__\b)|"
-            +"(?<FILE>__FILE__\b)|"
-            +"(?<DIR>__DIR__\b)|"
-            +"(?<CLASSC>__CLASS__\b)|"
-            +"(?<TRAITC>__TRAIT__\b)|"
-            +"(?<METHODC>__METHOD__\b)|"
-            +"(?<FUNCC>__FUNCTION__\b)|"
-            +"(?<NSC>__NAMESPACE__\b)|"
-            +"(?<TRUE>true\b)|"
-            +"(?<FALSE>false\b)|"
-            +"(?<NULL>null\b)|"
-            +"(?<NAMESPACE>namespace\b)|"
-            +"(?<SELF>self\b)|"
-            +"(?<INSTANCEOF>instanceof\b)|"
-            +"(?<PARENT>parent\b)|"
-
-            +"(?<YIELDFROM>yield\\s+from\b)|"
-            +"(?<YIELD>yield\b)|"
-
-            +"(?<DIE>die\b)|"
-            +"(?<PRINT>print\b)|"
-
-            + "(?<INCLUDE>include\b)|"
-            + "(?<INCLUDEONCE>include_once\b)|"
-            //+"(?<REQUIRE>require\b)|"
-            //+"(?<REQUIREONCE>require_once\b)|"
-
-
-
-
-
-
-
-            + "(?<WHITESPACE>\\s+)"
-
-            + "";
-
+    }
 
 
     private CharSequence input;
@@ -203,7 +49,10 @@ public class Lexer {
         return null;
     }
 
+
+
     public Lexer(String s) {
+        fillPatterns();
         input = s;
 
         Vector<Integer> ints = new Vector<Integer>();
@@ -251,11 +100,17 @@ public class Lexer {
         this(makeStr(r));
     }
 
-    public Token next() {
-        return next(PATTERNS);
+    public Token lex() {
+        for (TokenPattern p: patterns) {
+            Token t = next(p.pattern, p.name);
+            if (t != null) {
+                return t;
+            }
+        }
+        return null;
     }
 
-    public Token next(Pattern p) {
+    public Token next(Pattern p, String name) {
         Matcher m = p.matcher(input);
         boolean b = m.find();
         if (!b)
@@ -266,7 +121,7 @@ public class Lexer {
             return null;
 
         String s = input.subSequence(mr.start(), mr.end()).toString();
-        Token result = new Token(s, 0, locationOf(where + mr.start()),
+        Token result = new Token(s, name, locationOf(where + mr.start()),
                 locationOf(where + mr.end()));
 
         input = input.subSequence(mr.end(), input.length());
@@ -278,7 +133,11 @@ public class Lexer {
         return input.length() == 0;
     }
 
-    public Token next(String regexp) {
-        return next(Pattern.compile(regexp));
+    public Token next(String regexp, String name) {
+        return next(Pattern.compile(regexp), name);
+    }
+
+    public Token next(TokenPattern tp) {
+        return next(Pattern.compile(tp.pattern), tp.name);
     }
 }

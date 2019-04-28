@@ -9,7 +9,7 @@ public class Main {
 
         Lexer l = new Lexer(in);
         while (true) {
-            Token x = l.next();
+            Token x = l.lex();
             if (x ==null) {
                 System.out.println("null");
 
@@ -19,7 +19,7 @@ public class Main {
 
         }
         // error handling
-        System.out.println("Error");
+        System.out.println("Don");
 
     }
 }

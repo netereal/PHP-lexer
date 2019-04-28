@@ -1,19 +1,19 @@
 public class Token {
 
 
-    public Token(String image, int id, Location begin, Location end) {
+    public Token(String image, String id, Location begin, Location end) {
         this.id = id;
-        this.image = image;
+        this.data = image;
         this.begin = begin;
         this.end = end;
     }
 
-    public final int id;
-    public final String image;
+    public final String id;
+    public final String data;
     public final Location begin;
     public final Location end;
 
     public String toString() {
-        return "Token['" + image + "' id=" + id + " " + begin + ".." + end + "]";
+        return "Token[ " + "id=" + id + " " + "token " + data +  " " + begin + ".." + end + "]";
     }
 }
