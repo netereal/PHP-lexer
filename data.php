@@ -5,23 +5,71 @@
  * @package WordPress
  * @subpackage Administration
  */
- \q
- @g
- 2->22
-$q || $m && $a | &c & $b == 100
-$q += $m -= $a .= 2.3 %= 11.1 /= 100 *= 66 &= 1 |= 22 ^= 88 >>= 5 <<=7 === 111.2 !==n 44
-44 ++ 22 -- 2 -> $a => 1 **
-3 ?? 1
-\\
 
+
+$a = 0;
+$b = 0;
+
+for( $i = 0; $i<5; $i++ ) {
+     $a += 10;
+     $b += 5;
+}
+echo ("At the end of the loop a = $a and b = $b" );
+
+if ( 7 == 5){
+    1 -(3 +[5*8]) *55 /7 = 10;
+}
+
+$i = 0;
+         $num = 50;
+
+         while( $i < 10) {
+                     $i++;
+                     if( $i == 3 )break;
+                  }
+                  echo ("Loop stopped at i = $i" );
+
+         echo ("Loop stopped at i = $i and num = $num" );
+         do {
+                     $i++;
+                  }
+
+                  while( $i < 10 );
+                  echo ("Loop stopped at i = $i" );
+                  $array = array( 1, 2, 3, 4, 5);
+
+                           foreach( $array as $value ) {
+                              echo "Value is $value <br />";
+                           }
+
+                            foreach( $array as $value ) {
+                               if( $value == 3 )continue;
+                               echo "Value is $value <br />";
+                            }
 /**
  * In WordPress Administration Screens
  *
  * @since 2.3.2
  */
-if ( ! defined( 'WP_ADMIN' ) ) {
-	define( 'WP_ADMIN', true );
-}
+
+ \q
+ @g
+ 2->22
+$q || $m && $a | &c & $b == 100
+$q += $m -= $a .= 2.3 %= 11.1 /= 100 *= 66 &= 1 |= 22 ^= 88 >>= 5 <<=7 === 111.2 !== 5
+44 ++ 22 -- 2 -> $a => 1 **
+
+3 ?? 1 ~ 5 ...;
+4::6
+g:6,8;
+5 or 6 and 4 xor 9;
+1 -(3 +5) *55 /7 = 10;
+3 == 10%3^2;
+10 = .3;
+$s <=> 5;
+$s >> 3;
+$d << 0;
+5 >>= 5 | 5 <<=6 | $a >> 5 | >>= 6 | <= 7 | >= 3 | < 6 | > 9;
 
 if ( ! defined( 'WP_NETWORK_ADMIN' ) ) {
 	define( 'WP_NETWORK_ADMIN', false );

@@ -71,12 +71,15 @@
 +"(?<LOGICAL_OR>or\b)|"
 +"(?<LOGICAL_AND>and\b)|"
 +"(?<LOGICAL_XOR>xor\b)|"
+
+
 +"(?<PARENTHESIS_OPEN>\\()|"
 +"(?<PARENTHESIS_CLOSE>\\))|"
 +"(?<BRACKET_OPEN>\\[)|"
 +"(?<BRACKET_CLOSE>\\])|"
 +"(?<BRACE_OPEN>{)|"
 +"(?<BRACE_CLOSE>})|"
+
 +"(?<NEW>new\b)|"
 +"(?<CLONE>clone\b)|"
 +"(?<EXIT>exit\b)|"
@@ -107,6 +110,8 @@
 +"(?<RETURN>return\b)|"
 +"(?<TRY>try\b)|"
 +"(?<CATCH>catch\b)|"
+
+
 +"(?<FINALLY>finally\b)|"
 +"(?<THROW>throw\b)|"
 +"(?<USE>use\b)|"
@@ -128,6 +133,7 @@
 +"(?<INTERFACE>interface\b)|"
 +"(?<EXTENDS>extends\b)|"
 +"(?<IMPLEMENTS>implements\b)|"
+
 +"(?<LIST>list\b)|"
 +"(?<ARRAY>array\b)|"
 +"(?<CALLABLE>callable\b)|"
